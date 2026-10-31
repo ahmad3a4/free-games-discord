@@ -1,0 +1,20 @@
+# Copy this file to .github/workflows/free-games.yml in any repository,
+# and add your Discord webhook URL as a secret named DISCORD_WEBHOOK_URL.
+
+name: Free games
+
+on:
+  schedule:
+    - cron: '17 */3 * * *'   # every 3 hours
+  workflow_dispatch:          # adds a "Run workflow" button
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ahmad3a4/free-games-discord@v1
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          # stores: steam, epic, gog   # default: every store except mobile
+          # mention: everyone          # or a role ID
+          # upcoming: true             # also post next week's Epic free games

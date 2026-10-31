@@ -1,0 +1,73 @@
+name: Free Games to Discord
+description: Post free game giveaways from Steam, Epic, GOG, itch.io and more to a Discord channel.
+author: ahmad3a4
+branding:
+  icon: gift
+  color: purple
+
+inputs:
+  webhook-url:
+    description: Discord webhook URL. Store it as a repository secret. Separate several with commas.
+    required: false
+  stores:
+    description: 'Stores to include: pc (all but mobile), all, or a list like "steam, epic, gog".'
+    default: pc
+  upcoming:
+    description: Also post the Epic Games Store's free games for next week.
+    default: 'false'
+  mention:
+    description: Ping with the first new post. "everyone", "here", or a role ID. Empty for no ping.
+    default: ''
+  max-posts:
+    description: Most games to post in one run. The rest are posted on the next run.
+    default: '10'
+  first-run:
+    description: On the very first run, "post" the current giveaways or "skip" them and only post new ones.
+    default: post
+  dry-run:
+    description: List the giveaways in the log without posting.
+    default: 'false'
+  state-key:
+    description: Cache name for remembering posted games. Change it to run several separate feeds in one repo.
+    default: free-games-discord
+
+outputs:
+  posted-count:
+    description: How many games were posted in this run.
+    value: ${{ steps.post.outputs.posted-count }}
+
+runs:
+  using: composite
+  steps:
+    - name: Restore list of posted games
+      if: inputs.dry-run != 'true'
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{ runner.temp }}/free-games-state.json
+        key: ${{ inputs.state-key }}-${{ github.run_id }}-${{ github.run_attempt }}
+        restore-keys: ${{ inputs.state-key }}-
+
+    - name: Post free games
+      id: post
+      shell: bash
+      env:
+        DISCORD_WEBHOOK_URL: ${{ inputs.webhook-url }}
+        INPUT_STORES: ${{ inputs.stores }}
+        INPUT_UPCOMING: ${{ inputs.upcoming }}
+        INPUT_MENTION: ${{ inputs.mention }}
+        INPUT_MAX_POSTS: ${{ inputs.max-posts }}
+        INPUT_FIRST_RUN: ${{ inputs.first-run }}
+        INPUT_DRY_RUN: ${{ inputs.dry-run }}
+      run: |
+        args=(--state "$RUNNER_TEMP/free-games-state.json" --stores "$INPUT_STORES" --mention "$INPUT_MENTION"
+              --max-posts "$INPUT_MAX_POSTS" --first-run "$INPUT_FIRST_RUN")
+        [ "$INPUT_UPCOMING" = "true" ] && args+=(--upcoming)
+        [ "$INPUT_DRY_RUN" = "true" ] && args+=(--dry-run)
+        node "$GITHUB_ACTION_PATH/bin/cli.js" "${args[@]}"
+
+    - name: Save list of posted games
+      if: always() && inputs.dry-run != 'true'
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ runner.temp }}/free-games-state.json
+        key: ${{ inputs.state-key }}-${{ github.run_id }}-${{ github.run_attempt }}

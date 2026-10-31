@@ -1,0 +1,5 @@
+node_modules/
+.free-games-state.json
+*.tmp
+*.log
+.playwright-mcp/

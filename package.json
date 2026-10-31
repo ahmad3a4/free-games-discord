@@ -1,0 +1,37 @@
+{
+  "name": "free-games-discord",
+  "version": "1.0.0",
+  "description": "Post free game giveaways from Steam, Epic, GOG, itch.io and more to your Discord server. Runs on GitHub Actions, no server needed.",
+  "type": "module",
+  "bin": {
+    "free-games-discord": "bin/cli.js"
+  },
+  "files": [
+    "bin",
+    "src"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18.11"
+  },
+  "keywords": [
+    "discord",
+    "free-games",
+    "epic-games",
+    "steam",
+    "gog",
+    "giveaways",
+    "github-actions",
+    "webhook"
+  ],
+  "author": "Ahmad (https://github.com/ahmad3a4)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahmad3a4/free-games-discord.git"
+  },
+  "homepage": "https://github.com/ahmad3a4/free-games-discord#readme",
+  "bugs": "https://github.com/ahmad3a4/free-games-discord/issues"
+}
